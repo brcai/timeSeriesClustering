@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a57bf70c-b06b-4139-a2bb-9de9b6c2ab32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>code.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +22,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="code.py" />
+    <Compile Include="dataEcg200.py" />
+    <Compile Include="dbscan.py" />
+    <Compile Include="fastCluster.py" />
+    <Compile Include="incDP.py" />
+    <Compile Include="kmeans.py" />
+    <Compile Include="sdbDp.py" />
+    <Compile Include="timeSeriesData.py" />
+    <Compile Include="timeSeriesGen.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
