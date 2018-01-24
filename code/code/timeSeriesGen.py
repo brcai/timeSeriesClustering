@@ -35,10 +35,10 @@ def genShift(classNum, length, dataNum, step):
 	   0.84429,0.87548,0.98458,0.91121,0.64469,0.54624,0.74881,0.9048,0.76475,0.56709,0.63115,0.91369,1.16,1.25,1.2581,1.2938,1.3502,1.3011,1.0883,
 	   0.86683,0.81278,0.85455,0.81905,0.76498,0.8761,1.0859,1.1447,1.022,0.92983,0.96388,1.0142]
 	num = dataNum / classNum
-	feats1 = [base1]
-	feats2 = [base2]
-	tmp1 = base1.copy()
-	tmp2 = base2.copy()
+	feats1 = [normlize(base1)]
+	feats2 = [normlize(base2)]
+	tmp1 = normlize(base1).copy()
+	tmp2 = normlize(base2).copy()
 	for i in range(49):
 		tmp1 = tmp1[step:] + tmp1[:step]
 		feats1.append(tmp1)
@@ -58,6 +58,6 @@ def plot(feats):
 
 if __name__ == "__main__":
 	print("start gen time series:")
-	feats, labs = genShift(2, 0, 0, 2)
+	feats, labs = genShift(2, 0, 0, 3)
 	plot(feats)
 	print("end of test!!")

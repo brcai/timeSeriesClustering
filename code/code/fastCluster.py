@@ -23,7 +23,8 @@ def euclidean(vec1, vec2):
 	dist = 0.
 	for i in range(len(vec1)):
 		dist += pow((vec1[i] - vec2[i]), 2)
-	res = np.sqrt(dist) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+	#res = np.sqrt(dist) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+	res = np.sqrt(dist)
 	return res
 
 def l1Norm(vec1, vec2):
@@ -32,8 +33,24 @@ def l1Norm(vec1, vec2):
 	for i in range(len(vec1)):
 		dist += abs(vec1[i] - vec2[i])
 		norm += abs(vec1[i]) + abs(vec2[i]) 
-	res = dist/norm
+	#res = dist/norm
+	res = dist
 	return res             
+
+def SBD(x, y):
+	lent = pow(2, int(np.log2(2*len(x)-1))+1)
+	CC = np.real(np.fft.ifft(np.fft.fft(x, lent) * np.conjugate(np.fft.fft(y,lent))))
+	NCCc = CC
+	NCCc = CC/(np.linalg.norm(x)*np.linalg.norm(y))
+	shift = NCCc.tolist().index(max(NCCc)) - len(x)
+	dist = 1 - max(NCCc)
+	'''
+	if shift > 0:
+		newy = np.zeros(shift).tolist() + y[1:(len(y)-shift)]
+	else:
+		newy = y[(1-shift):] + np.zeros(1-shift).tolist()
+	'''
+	return dist
 
 
 def read():
@@ -65,21 +82,21 @@ def read():
 '''
 
 class IncDP:
-	def __init__(self, k, dc):
-		#self.feats, self.trueLabels = read()
-		self.feats, self.trueLabels = genShift(2, 0, 0, 1)
-		self.k = k
-		self.labels = [-1 for i in range(len(self.feats))]
-		self.clusters = {}
-		self.dc = dc
-		self.micros = {}         #key = id, value = [memmbers number, centre, average, members index, [delta distance, delta centroid]]
-		self.rest = []
+	def getDist(self, x, y):
+		if self.dist == 'eu':
+			return euclidean(x, y)
+		elif self.dist == 'l1':
+			return l1Norm(x, y)
+		elif self.dist == 'sbd':
+			return SBD(x, y)
+		return -1.
+
 
 	def addToMicroCluster(self, x, idx):
 		minDist = 1000.
 		minMicro = -1
 		for key in self.micros:
-			dist = euclidean(x, self.micros[key][1])
+			dist = self.getDist(x, self.micros[key][1])
 			if dist <= self.dc:
 				if dist < minDist: minDist = dist; minMicro = key
 		if minMicro == -1: 
@@ -110,7 +127,7 @@ class IncDP:
 			minDist = 1000.
 			minMicro = -1
 			for key in self.micros:
-				dist = euclidean(x, self.micros[key][1])
+				dist = self.getDist(x, self.micros[key][1])
 				if dist < minDist: minDist = dist; minMicro = key
 			n = self.micros[minMicro][0]
 			self.micros[minMicro][0] += 1
@@ -125,11 +142,11 @@ class IncDP:
 		distMat = [[-1. for i in range(len(self.micros))] for j in range(len(self.micros))]
 		distMat = np.mat(distMat)
 		densityArr = [[self.micros[key][0], key] for key in self.micros]
-		densityArr.sort()
+		densityArr.sort(reverse = True)
 		for i in range(len(self.micros)):
 			for j in range(len(self.micros)):
 				if i == j: distMat[i, j ] = 0.
-				else: distMat[i, j] = euclidean(self.micros[i][2], self.micros[j][2])
+				else: distMat[i, j] = SBD(self.micros[i][2], self.micros[j][2])
 
 		#assign delta to each centroids, their row is the number of members
 		print('assigning clusters')
@@ -137,10 +154,9 @@ class IncDP:
 		for i in range(len(densityArr)):
 			minDist = 10000.
 			delta = -1
-			for j in range(i, len(densityArr)):
-				if i == j: continue
-				if self.micros[densityArr[j][1]][0] > self.micros[densityArr[i][1]][0]:
-					if minDist >= distMat[densityArr[i][1], densityArr[j][1]]: minDist = distMat[densityArr[i][1], densityArr[j][1]]; delta = densityArr[j][1]
+			for j in range(0, i):
+				if self.micros[densityArr[j][1]][0] >= self.micros[densityArr[i][1]][0]:
+					if minDist > distMat[densityArr[i][1], densityArr[j][1]]: minDist = distMat[densityArr[i][1], densityArr[j][1]]; delta = densityArr[j][1]
 			if delta != -1:
 				self.micros[densityArr[i][1]].append([minDist, delta])
 			else:
@@ -212,8 +228,8 @@ class IncDP:
 		densMulDelta = [[self.micros[key][0]*self.micros[key][4][0], key] for key in self.micros]
 		densMulDelta.sort(reverse = True)
 		centres = [itm[1] for itm in densMulDelta[:self.k]]
-		self.plotDgraph(centres)
-		for elem in densityArr[::-1]:
+		#self.plotDgraph(centres)
+		for elem in densityArr:
 			if elem[1] in centres: self.clusters[elem[1]] = id; id += 1
 			else: 
 				if self.micros[elem[1]][4][1] == -1: 
@@ -232,12 +248,20 @@ class IncDP:
 		for idx, feat in enumerate(self.feats):
 			self.microCluster(feat, idx)
 		self.groupRestData()
+		fp = open('C:\\study\\time-series\\git\\timeSeriesClustering\\micros.txt', 'w')
+		for i in self.micros:
+			fp.write(str(i) + ':\n')
+			for j in self.micros[i][3]:
+				fp.write(str(j)+',')
+			fp.write('\n')
+		fp.close()
+
 		print('number of micros = ' + str(len(self.micros)))
 		#self.plotMicro()
-		
 		#macro clustering to output
 		print('start macro clustering!!')
 		self.macroCluster()
+
 		#self.plotRes()
 		return
 
@@ -247,23 +271,42 @@ class IncDP:
 		amiTmp = metrics.adjusted_mutual_info_score(self.trueLabels, self.labels)
 		return amiTmp
 
+	def __init__(self, dc):
+		self.feats, self.trueLabels = read()
+		#self.feats, self.trueLabels = genShift(2, 0, 0, 1)
+		self.k = 3
+		self.labels = [-1 for i in range(len(self.feats))]
+		self.clusters = {}
+		self.dc = dc
+		self.micros = {}         #key = id, value = [memmbers number, centre, average, members index, [delta distance, delta centroid]]
+		self.rest = []
+		self.dist = 'eu'
+
+
 if __name__ == "__main__":
+	'''
+	inst = IncDP(0.006)
+	ami = inst.run()
+	print(ami)
+	
+	'''
 	print('start time = ' + str(datetime.datetime.now()))
 	maxAmi = 0.
-	for i in frange(0.01, 0.5, 0.05):
-		inst = IncDP(2, i)
+	for i in frange(0.01, 0.5, 0.01):
+		inst = IncDP(i)
 		#inst.plotFeats()
 		ami = inst.run()
 		if ami > maxAmi: maxAmi = ami
+		print('dc = '+str(inst.dc)+' ami = '+str(ami))
 	print('max ami = ' + str(maxAmi))
 	print('end time = ' + str(datetime.datetime.now()))
 	print('End of Test!!')
 	'''
-	dataGen = Gen()
-	feats, labs = dataGen.genShift(2, 0, 0, 5)
-	plt.plot(feats[0])
-	plt.plot(feats[50])
-	plt.show()
-	print(crossCorr(feats[0], feats[50]))
-	print(crossCorr(feats[0], feats[1]))
+	fp = open('C:\\study\\time-series\\git\\timeSeriesClustering\\tmp.txt', 'w')
+	feats,labls = genShift(2,0,0,3)
+	for i in feats:
+		for idx, j in enumerate(feats):
+			fp.write(str(idx)+'-'+str(crossCorr(i, j))+',')
+		fp.write('\n')
+	fp.close()
 	'''

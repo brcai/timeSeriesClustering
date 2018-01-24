@@ -86,7 +86,7 @@ class dbscan:
 		for i in range(len(dataVecs)):
 			tmp = []
 			for j in range(len(dataVecs)):
-				dist = stpw.euclidean(dataVecs[i], dataVecs[j])
+				dist = stpw.l1Norm(dataVecs[i], dataVecs[j])
 				tmp.append(dist)
 				tmpSet.add(dist)
 			distMat.append(tmp)
