@@ -23,8 +23,8 @@ def euclidean(vec1, vec2):
 	dist = 0.
 	for i in range(len(vec1)):
 		dist += pow((vec1[i] - vec2[i]), 2)
-	#res = np.sqrt(dist) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
-	res = np.sqrt(dist)
+	res = np.sqrt(dist) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+	#res = np.sqrt(dist)
 	return res
 
 def l1Norm(vec1, vec2):
@@ -248,14 +248,7 @@ class IncDP:
 		for idx, feat in enumerate(self.feats):
 			self.microCluster(feat, idx)
 		self.groupRestData()
-		fp = open('C:\\study\\time-series\\git\\timeSeriesClustering\\micros.txt', 'w')
-		for i in self.micros:
-			fp.write(str(i) + ':\n')
-			for j in self.micros[i][3]:
-				fp.write(str(j)+',')
-			fp.write('\n')
-		fp.close()
-
+		self.writeMicros()
 		print('number of micros = ' + str(len(self.micros)))
 		#self.plotMicro()
 		#macro clustering to output
@@ -265,6 +258,15 @@ class IncDP:
 		#self.plotRes()
 		return
 
+	def writeMicros(self):
+		fp = open('C:\\study\\time-series\\git\\timeSeriesClustering\\micros.txt', 'w')
+		for key in self.micros:
+			fp.write(str(key)+':\n')
+			for itm in self.micros[key][3]:
+				fp.write(str(itm)+',')
+			fp.write('\n')
+		fp.close()
+		return
 
 	def run(self):
 		self.incAssign()
@@ -272,9 +274,9 @@ class IncDP:
 		return amiTmp
 
 	def __init__(self, dc):
-		self.feats, self.trueLabels = read()
-		#self.feats, self.trueLabels = genShift(2, 0, 0, 1)
-		self.k = 3
+		#self.feats, self.trueLabels = read()
+		self.feats, self.trueLabels = genShift(2, 0, 0, 1)
+		self.k = 2
 		self.labels = [-1 for i in range(len(self.feats))]
 		self.clusters = {}
 		self.dc = dc
@@ -284,7 +286,7 @@ class IncDP:
 
 
 if __name__ == "__main__":
-	'''
+	
 	inst = IncDP(0.006)
 	ami = inst.run()
 	print(ami)
@@ -301,12 +303,12 @@ if __name__ == "__main__":
 	print('max ami = ' + str(maxAmi))
 	print('end time = ' + str(datetime.datetime.now()))
 	print('End of Test!!')
-	'''
+	
 	fp = open('C:\\study\\time-series\\git\\timeSeriesClustering\\tmp.txt', 'w')
-	feats,labls = genShift(2,0,0,3)
+	feats,labls = genShift(2,0,0,1)
 	for i in feats:
 		for idx, j in enumerate(feats):
-			fp.write(str(idx)+'-'+str(crossCorr(i, j))+',')
+			fp.write(str(idx)+'-'+str(euclidean(i, j))+',')
 		fp.write('\n')
 	fp.close()
 	'''

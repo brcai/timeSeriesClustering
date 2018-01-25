@@ -44,8 +44,8 @@ def genShift(classNum, length, dataNum, step):
 		feats1.append(tmp1)
 		tmp2 = tmp2[step:] + tmp2[:step]
 		feats2.append(tmp2)
-	feats = feats1 + feats2
-	labs = [0 for i in range(50)] + [1 for i in range(50)]
+	feats = feats1[3:10] + feats1[:3] + feats2[:40] + feats1[10:] + feats2[40:]
+	labs = [0 for i in range(10)] + [1 for i in range(40)] + [0 for i in range(40)] + [1 for i in range(10)]
 	return feats, labs
 
 def plot(feats):
@@ -58,6 +58,6 @@ def plot(feats):
 
 if __name__ == "__main__":
 	print("start gen time series:")
-	feats, labs = genShift(2, 0, 0, 3)
+	feats, labs = genShift(2, 0, 0, 1)
 	plot(feats)
 	print("end of test!!")
