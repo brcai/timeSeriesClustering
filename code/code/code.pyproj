@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="centres.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="dataEcg200.py" />
     <Compile Include="dbscan.py" />
     <Compile Include="fastCluster.py" />

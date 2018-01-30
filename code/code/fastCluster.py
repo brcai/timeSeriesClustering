@@ -8,6 +8,7 @@ import datetime
 import random
 from sklearn.decomposition import PCA
 from timeSeriesGen import genShift
+from centres import get_centroids, getDense
 
 def frange(x, y, jump):
   while x < y:
@@ -197,11 +198,16 @@ class IncDP:
 		return
 
 	def plotRes(self):
+		centres = get_centroids(self.feats, 3)
 		dx = [itm[0] for itm in self.feats]
 		dy = [itm[1] for itm in self.feats]
 		colors = cm.rainbow(np.linspace(0, 1, 4))
-		dpcolorMap2 = [colors[self.labels[itm]] for itm in range(len(self.labels))]
-		plt.scatter(dx, dy, c=dpcolorMap2, marker='.', s=300, alpha=0.5)
+		dpcolorMap1 = [colors[self.labels[itm]] for itm in range(len(self.labels))]
+		plt.scatter(dx, dy, c=dpcolorMap1, marker='.', s=300, alpha=0.1)
+		cx = [itm[0] for itm in centres]
+		cy = [itm[1] for itm in centres]
+		dpcolorMap2 = ['r']
+		plt.scatter([centres[0][0]], [centres[0][1]], c=dpcolorMap2, marker='.', s=300, alpha=0.5)
 		plt.xlabel(r'$x$', fontsize=25)
 		plt.ylabel(r'$y$', fontsize=25)
 		plt.show()
@@ -245,8 +251,15 @@ class IncDP:
 	def incAssign(self):
 		#first micro clustering
 		print('start micro clustering!!')
+		#n = len(self.feats[0])
+		#centres = get_centroids(self.feats, 3)
+		#pivot = centres[0]
+		dists = [[0., i] for i in range(len(self.feats))]
 		for idx, feat in enumerate(self.feats):
-			self.microCluster(feat, idx)
+			dists[idx][0] = getDense(self.feats, idx)
+		dists.sort()
+		for itm in dists:
+			self.microCluster(self.feats[itm[1]], itm[1])
 		self.groupRestData()
 		self.writeMicros()
 		print('number of micros = ' + str(len(self.micros)))
@@ -255,7 +268,7 @@ class IncDP:
 		print('start macro clustering!!')
 		self.macroCluster()
 
-		#self.plotRes()
+		self.plotRes()
 		return
 
 	def writeMicros(self):
@@ -274,9 +287,9 @@ class IncDP:
 		return amiTmp
 
 	def __init__(self, dc):
-		#self.feats, self.trueLabels = read()
-		self.feats, self.trueLabels = genShift(2, 0, 0, 1)
-		self.k = 2
+		self.feats, self.trueLabels = read()
+		#self.feats, self.trueLabels = genShift(2, 0, 0, 1)
+		self.k = 3
 		self.labels = [-1 for i in range(len(self.feats))]
 		self.clusters = {}
 		self.dc = dc
@@ -287,8 +300,11 @@ class IncDP:
 
 if __name__ == "__main__":
 	
-	inst = IncDP(0.006)
-	ami = inst.run()
+	#inst = IncDP(0.006)
+	for i in range(100):
+		inst = IncDP(0.1)
+	
+		ami = inst.run()
 	print(ami)
 	
 	'''
