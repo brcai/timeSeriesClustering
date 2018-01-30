@@ -55,7 +55,7 @@ def SBD(x, y):
 
 
 def read():
-	fp = open('C:/study/time-series/ecgfivedays/blobs.txt')
+	fp = open('../../blobs.txt')
 	features = []
 	trueLabels = []
 	for line in fp.readlines():
