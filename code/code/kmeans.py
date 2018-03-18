@@ -4,36 +4,35 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import re
 from sklearn import metrics
-from timeSeriesGen import genShift
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import DBSCAN
+from funcs import *
 
-def frange(x, y, jump):
-  while x < y:
-    yield x
-    x += jump
+def brdp(a, eps):
+	p = []
+	l = int(len(a) / 10)
 
+	s = sum(a[:l]) / l
+	e = sum(a[-l:]) / 1
+	
+	sigmay2 = sum([pow(itm,2) for itm in a[1:-1]])
+	sigmag2 = 0.
+	sigmaf2 = 0.
+	sigmayg = 0.
+	sigmayf = 0.
 
-def read():
-	fp = open('C:/study/time-series/ecgfivedays/ecgfivedays')
-	features = []
-	label = []
-	for line in fp.readlines():
-		oneRow = []
-		raw = line.replace('\n', '')
-		raw = re.split(',', raw)
-		oneRow = [itm for itm in raw if itm != '']
-		label.append(int(oneRow[0]))
-		features.append([float(itm) for itm in oneRow[1:]])
-	return features, label
+	maxv = 0.
+
+	for i in range(1, len(a)-1):
+		
+
+	return p
 
 
 if __name__ == "__main__":
-	feat, label = genShift(2, 0, 0, 5)
-	db = KMeans(n_clusters=2).fit(feat)
-	dlabel = db.labels_
-	dd = []
-	for itm in dlabel:
-		if itm == -1: dd.append(tmp); tmp += 1
-		else: dd.append(itm)
-	ars = metrics.adjusted_mutual_info_score(label, dd)
-	print('kmeans ars = ' + str(ars))
+	print('Kmeans (dtwdist):')
+	feats, labs = read('cbf')
+
+
+
 	print('The end...')

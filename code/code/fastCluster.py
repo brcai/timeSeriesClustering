@@ -24,8 +24,8 @@ def euclidean(vec1, vec2):
 	dist = 0.
 	for i in range(len(vec1)):
 		dist += pow((vec1[i] - vec2[i]), 2)
-	res = np.sqrt(dist) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
-	#res = np.sqrt(dist)
+	#res = np.sqrt(dist) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+	res = np.sqrt(dist)
 	return res
 
 def l1Norm(vec1, vec2):
@@ -53,7 +53,7 @@ def SBD(x, y):
 	'''
 	return dist
 
-
+'''
 def read():
 	fp = open('../../blobs.txt')
 	features = []
@@ -66,10 +66,9 @@ def read():
 		features.append([float(itm) for itm in oneRow])
 	trueLabels = [-1 for i in range(len(features))]
 	return features, trueLabels
-
 '''
-def read():
-	fp = open('C:/study/time-series/ecgfivedays/ecgfivedays.txt')
+def read(name):
+	fp = open('C:/study/time-series/'+name+'/data.txt')
 	features = []
 	label = []
 	for line in fp.readlines():
@@ -80,7 +79,7 @@ def read():
 		label.append(int(oneRow[0]))
 		features.append([float(itm) for itm in oneRow[1:]])
 	return features, label
-'''
+
 
 class IncDP:
 	def getDist(self, x, y):
@@ -132,7 +131,7 @@ class IncDP:
 				if dist < minDist: minDist = dist; minMicro = key
 			n = self.micros[minMicro][0]
 			self.micros[minMicro][0] += 1
-			tmp = [(self.micros[minMicro][2][i] * n + x[i]) / (n+1) for i in range(len(x))]
+			tmp = [(self.micros[minMicro][2][i] * n + xn[i]) / (n+1) for i in range(len(x))]
 			self.micros[minMicro][2] = tmp
 			self.micros[minMicro][3].append(idx)		
 		return
@@ -142,7 +141,8 @@ class IncDP:
 		print('calculating distance matrix!!')
 		distMat = [[-1. for i in range(len(self.micros))] for j in range(len(self.micros))]
 		distMat = np.mat(distMat)
-		densityArr = [[self.micros[key][0], key] for key in self.micros]
+		densityArr = [[self.micros[key]
+				 [0], key] for key in self.micros]
 		densityArr.sort(reverse = True)
 		for i in range(len(self.micros)):
 			for j in range(len(self.micros)):
@@ -251,12 +251,16 @@ class IncDP:
 	def incAssign(self):
 		#first micro clustering
 		print('start micro clustering!!')
-		#n = len(self.feats[0])
-		#centres = get_centroids(self.feats, 3)
-		#pivot = centres[0]
+		n = len(self.feats[0])
+		centres = get_centroids(self.feats, 3)
+		pivot = [1000000. for i in range(n)]
 		dists = [[0., i] for i in range(len(self.feats))]
+		'''
 		for idx, feat in enumerate(self.feats):
 			dists[idx][0] = getDense(self.feats, idx)
+		'''
+		for idx, feat in enumerate(self.feats):
+			dists[idx][0] = euclidean(feat, pivot)
 		dists.sort()
 		for itm in dists:
 			self.microCluster(self.feats[itm[1]], itm[1])
@@ -268,7 +272,7 @@ class IncDP:
 		print('start macro clustering!!')
 		self.macroCluster()
 
-		self.plotRes()
+		#self.plotRes()
 		return
 
 	def writeMicros(self):
@@ -287,9 +291,9 @@ class IncDP:
 		return amiTmp
 
 	def __init__(self, dc):
-		self.feats, self.trueLabels = read()
+		self.feats, self.trueLabels = read('arrow')
 		#self.feats, self.trueLabels = genShift(2, 0, 0, 1)
-		self.k = 3
+		self.k = 2
 		self.labels = [-1 for i in range(len(self.feats))]
 		self.clusters = {}
 		self.dc = dc
@@ -300,11 +304,8 @@ class IncDP:
 
 if __name__ == "__main__":
 	
-	#inst = IncDP(0.006)
-	for i in range(100):
-		inst = IncDP(0.1)
-	
-		ami = inst.run()
+	inst = IncDP(0.01)
+	ami = inst.run()
 	print(ami)
 	
 	'''

@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a57bf70c-b06b-4139-a2bb-9de9b6c2ab32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>fastCluster.py</StartupFile>
+    <StartupFile>tmp.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -26,12 +26,24 @@
     </Compile>
     <Compile Include="dataEcg200.py" />
     <Compile Include="dbscan.py" />
+    <Compile Include="drawTimeSeries.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="fastCluster.py" />
-    <Compile Include="incDP.py" />
+    <Compile Include="dp.py" />
+    <Compile Include="funcs.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="kmeans.py" />
+    <Compile Include="readgaitpdb.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="sdbDp.py" />
     <Compile Include="timeSeriesData.py" />
     <Compile Include="timeSeriesGen.py" />
+    <Compile Include="tmp.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
