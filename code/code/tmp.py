@@ -70,8 +70,8 @@ def getAngle(l, a, r, deltal, deltar):
 	angle = abs(180 - np.arccos(np.dot(va,vb))*180/np.pi)
 	return angle
 
-def noLower(a,b):
-	if a - b< 0: return 0
+def noLower(a,b,c):
+	if a - b< c: return c
 	else: return a - b
 
 def noBigger(a,b,c):
@@ -88,23 +88,23 @@ def distSum(a, i):
 	deltar = 0
 	if i-t < 0:
 		l = 0
-		deltal = i-t
+		deltal = i
 	else:
 		l = i-t
-		deltal = l
+		deltal = t
 	if i+t > n:
-		deltar = i+t - n
+		deltar = n - i
 		r = n
 	else:
 		deltar = t
 		r = i+t
-	avgl = np.average(a[noLower(l, int(t/2)):noBigger(l, int(t/2), n)])
-	avgr = np.average(a[noLower(r, int(t/2)):noBigger(r, int(t/2), n)])
-	t = []
-	t.append(np.average(a[noLower(i, t):i]))
-	t.append(np.average(a[noLower(i, int(t/2)):noBigger(i, int(t/2), n)]))
-	t.append(np.average(a[i:noBigger(i, t, n)]))
-	dist = getArea(avgl, t, avgr, deltal, deltar)
+	avgl = np.average(a[noLower(l, int(t/2), 0):noBigger(l, int(t/2), i)])
+	avgr = np.average(a[noLower(r, int(t/2), i):noBigger(r, int(t/2), n)])
+	tt = []
+	tt.append(np.average(a[noLower(i, t, 0):i]))
+	tt.append(np.average(a[noLower(i, int(t/2), i):noBigger(i, int(t/2), n)]))
+	tt.append(np.average(a[i:noBigger(i, t, n)]))
+	dist = max([getArea(avgl, itm, avgr, deltal, deltar) for itm in tt])
 	return dist
 
 
@@ -126,7 +126,7 @@ for i in range(1, len(feats)):
 	plt.scatter([idx],a[idx]+1)
 	plt.show()
 	'''
-	b, b1 = srdp(a, 6.14685885246836292, 5)
+	b, b1 = srdp(a, 1, 5)
 	ttt = [itm[1] for itm in b1]
 	ttt[0] = sum(ttt[:12])/12
 	ttt[-1] = sum(ttt[-12:])/12
