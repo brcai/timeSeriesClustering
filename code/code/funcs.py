@@ -63,18 +63,6 @@ def rdpwrap(a, eps):
 	d = [itm[0] for itm in c]
 	return d
 
-def dtwdist(a, b):
-    tmp = [[-1. for i in range(len(b)+1)] for j in range(len(a)+1)]
-    distmat = np.mat(tmp)
-    distmat[0, :] = 100000.
-    distmat[:, 0] = 100000.
-    distmat[0, 0] = 0.
-    for i in range(1, len(a)+1):
-        for j in range(1, len(b)+1):
-            cost = abs(a[i-1] - b[j-1])
-            distmat[i, j] = min(distmat[i-1, j], distmat[i, j-1], distmat[i-1, j-1]) + cost
-    return distmat[len(a), len(b)] / max(len(a), len(b))
-
 def getCorner(a):
 	maxdist = 0.
 	idx = 0
@@ -147,6 +135,28 @@ def distSum(a, idx):
         else:
             dist += getDist([a[idx],a[j],a[-1]])
     return dist
+
+def getCorner(a, num):
+	extremum = [0]
+	for idx in range(1, len(a)-1):
+		if a[idx] > a[idx-1] and a[idx] > a[idx+1]: extremum.append(idx)
+		if a[idx] < a[idx-1] and a[idx] < a[idx+1]: extremum.append(idx)
+	extremum.append(len(a)-1)
+	areas = []
+	for idx in range(1, len(extremum)-1):
+		areas.append([getArea([anew[extremum[idx-1]],extremum[idx-1]],[anew[extremum[idx]],extremum[idx]],[anew[extremum[idx+1]],extremum[idx+1]]), extremum[idx]])
+	areas.sort(reverse=True)
+	areas[:num]
+	return [itm[1] for itm in areas]
+
+def getAllCorner(a):
+	extremum = [[0,a[0]]]
+	for idx in range(1, len(a)-1):
+		if a[idx] > a[idx-1] and a[idx] > a[idx+1]: extremum.append([idx,a[idx]])
+		if a[idx] < a[idx-1] and a[idx] < a[idx+1]: extremum.append([idx,a[idx]])
+	extremum.append([len(a)-1,a[-1]])
+	return extremum
+
 
 if __name__ == "__main__":
 	a = [[1,1],[2,2],[3,6],[4,6],[5,5]]

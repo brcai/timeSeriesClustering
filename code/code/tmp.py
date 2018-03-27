@@ -56,11 +56,11 @@ def znorm(a):
         b.append((itm-u)/delta)
     return b
 
-def getArea(l, a, r, deltal, deltar):
+def getArea(d0,d1,d2):
 	dist = 0.
-	x = [0,deltal,deltar]
-	y = [l,a,r]
-	ldist = 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
+	x = [d0[0],d1[0],d2[0]]
+	y = [d0[1],d1[1],d2[1]]
+	dist = 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 	return dist
 
 def getAngle(l, a, r, deltal, deltar):
@@ -80,31 +80,25 @@ def noBigger(a,b,c):
 
 def distSum(a, i):
 	dist = 0.
-	n = len(a)
-	t = int(n/10)
+	n = len(a)-1
+	t = int(len(a)/10)
 	l = 0
 	r = 0
-	deltal = 0
-	deltar = 0
 	if i-t < 0:
 		l = 0
-		deltal = i
 	else:
 		l = i-t
-		deltal = t
 	if i+t > n:
-		deltar = n - i
 		r = n
 	else:
-		deltar = t
 		r = i+t
-	avgl = np.average(a[noLower(l, int(t/2), 0):noBigger(l, int(t/2), i)])
-	avgr = np.average(a[noLower(r, int(t/2), i):noBigger(r, int(t/2), n)])
+	avgl = np.average(a[noLower(l, int(t/2), 0):(noBigger(l, int(t/2), i-1)+1)])
+	avgr = np.average(a[noLower(r, int(t/2), i+1):(noBigger(r, int(t/2), n)+1)])
 	tt = []
-	tt.append(np.average(a[noLower(i, t, 0):i]))
-	tt.append(np.average(a[noLower(i, int(t/2), i):noBigger(i, int(t/2), n)]))
-	tt.append(np.average(a[i:noBigger(i, t, n)]))
-	dist = max([getArea(avgl, itm, avgr, deltal, deltar) for itm in tt])
+	tt.append(np.average(a[noLower(i, t, l+1):i+1]))
+	tt.append(np.average(a[noLower(i, int(t/2), l+1):noBigger(i, int(t/2), r-1)+1]))
+	tt.append(np.average(a[i:noBigger(i, t, r-1)+1]))
+	dist = max([getArea(avgl, itm, avgr, l, i, r) for itm in tt])
 	return dist
 
 
@@ -116,6 +110,25 @@ a = []
 
 for i in range(1, len(feats)):
 	a = feats[i]
+	tmp = np.fft.fft(a)
+	tmp = np.append(tmp[:10], [0 for i in range(len(tmp)-10)])
+	anew = [itm.real for itm in np.fft.ifft(tmp)]
+	extremum = [0]
+	for idx in range(1, len(anew)-1):
+		if anew[idx] > anew[idx-1] and anew[idx] > anew[idx+1]: extremum.append(idx)
+		if anew[idx] < anew[idx-1] and anew[idx] < anew[idx+1]: extremum.append(idx)
+	extremum.append(len(anew)-1)
+	areas = []
+	for idx in range(1, len(extremum)-1):
+		areas.append([getArea([anew[extremum[idx-1]],extremum[idx-1]],[anew[extremum[idx]],extremum[idx]],[anew[extremum[idx+1]],extremum[idx+1]]), extremum[idx]])
+	areas.sort(reverse=True)
+	areas=areas[:8]
+	plt.scatter([itm[1] for itm in areas], [anew[itm[1]]+1 for itm in areas], c='r')
+	plt.scatter([idx for idx in extremum],[anew[idx] for idx in extremum])
+	plt.plot(np.fft.ifft(tmp))
+	plt.show()
+	plt.gcf().clear()
+	continue
 	'''
 	maxsum = 0.
 	idx = 0

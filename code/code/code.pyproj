@@ -35,6 +35,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="kmeans.py" />
+    <Compile Include="newdist.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="readgaitpdb.py">
       <SubType>Code</SubType>
     </Compile>
