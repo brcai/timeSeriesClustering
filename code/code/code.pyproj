@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a57bf70c-b06b-4139-a2bb-9de9b6c2ab32</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>tmp.py</StartupFile>
+    <StartupFile>weather_interval.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -44,7 +44,16 @@
     <Compile Include="sdbDp.py" />
     <Compile Include="timeSeriesData.py" />
     <Compile Include="timeSeriesGen.py" />
-    <Compile Include="tmp.py">
+    <Compile Include="weather_change_b.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="weather_interval.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="weather_change.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="weather_query.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
